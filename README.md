@@ -1,39 +1,20 @@
-# Feel CLI happiness tracker #
+# feel: A CLI happiness tracker #
 
-Wanted a project to work on so I could get familiar with a new language and to create something I may find practical for myself.
+A simple CLI command to track your current mood and feelings. Ideally, `feel` can provide you data on how you generally feel over time and encourage reflection on issues you overcame.
 
-Simple tool using a SQLite database to track your current mood and feelings. Feel can later provide you data on how you generally feel over time and facilitates reflection on issues you overcame.
+## About ##
 
-<!--
-Todo and thoughts:
+I wanted a project to work on so I could grow familiar with Golang and to create something I may find practical for myself. I see a lot of emotion trackers, but haven't noticed one yet for the command line. So, I figure this is an alright project idea.
 
-Use sentiment analysis or models to identify tags for what the user types?
-Try to find patterns in the user's comments?
-
-Notes:
-
-Issues compiling go packages using `go get` on my system. Always:
-
-> cc1.exe: sorry, unimplemented: 64-bit mode not compiled in
-
-Is an issue with the architecture, but I'm unsure if it's due to my Cygwin
-install or what.
-
-Downloaded Mingw-w64 from [here](https://mingw-w64.org/doku.php/download),
-recommended by this [GitHub issue](https://github.com/golang/go/issues/3441).
-
-Specified architecture x86_64 this time (vs i686; e.g., 32-bit).
-
-Changed `C:\MinGW\bin` in env var to be `C:\Program Files\mingw-w64\..\mingw64\bin`
-
-Refreshed shell, looks to have worked.
--->
+I'd like to see ambitious I become with this, like understanding user input to help provide more interesting stats.
 
 ## Configuration ##
 
-
+:construction:Under construction:construction:
 
 ## Examples ##
+
+:construction:These are prospective ideas and goals.:construction:
 
 ### now ###
 
@@ -71,17 +52,17 @@ Execution looks like:
 ```
 $ feel log
 
-     Date: Fri Jun 14 16:34:57 2019 -0700
-    Score: 3
+Date: Fri Jun 14 16:34:57 2019 -0700
+Score: 3
 Concerned: Looked like an idiot to my friends
- Grateful: Memes
-  Learned: How to chop onions
+Grateful: Memes
+Learned: How to chop onions
 
-     Date: Thu Jun 13 12:31:02 2019 -0700
-    Score: 5
+Date: Thu Jun 13 12:31:02 2019 -0700
+Score: 5
 Concerned: <no entry>
- Grateful: The Internet
-  Learned: They call the Big Mac a Royale with Cheese in France
+Grateful: The Internet
+Learned: They call the Big Mac a Royale with Cheese in France
 ```
 
 ### stat ###
@@ -110,12 +91,3 @@ Grateful: 7 (100%)
 Learned: 5 (71.4%)
 ```
 
-### reflect ###
-
-In progress. Does not provide anything that isn't obtainable with `log`.
-
-```
-$ feel reflect [--help|--amount|--random]
-```
-
-Execution looks like:
