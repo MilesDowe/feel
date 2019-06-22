@@ -1,9 +1,9 @@
 package util
 
 import (
-    _ "github.com/mattn/go-sqlite3" // database driver
 	"database/sql"
 	"fmt"
+	_ "github.com/mattn/go-sqlite3" // database driver
 )
 
 // TODO: get GOPATH lookup to work:
@@ -18,9 +18,13 @@ const createTable = "CREATE TABLE IF NOT EXISTS feel_recording (" +
 	"learn TEXT NULLABLE," +
 	"entered INTEGER)"
 
+const deleteRecordPerID = "DELETE FROM feel_recording WHERE id = ?"
+
 // OpenDb : returns a connection to the SQLite database
 func OpenDb() *sql.DB {
 	database, err := sql.Open("sqlite3", databaseLoc)
+
+	verifyTableExists(database)
 
 	if err != nil {
 		fmt.Println(err)
@@ -29,9 +33,16 @@ func OpenDb() *sql.DB {
 	return database
 }
 
-// VerifyDbExists : runs a query to create the standard table if it doesn't already exist
-func VerifyDbExists() {
-	db := OpenDb()
+// runs a query to create the standard feel_recording table if it doesn't already exist
+func verifyTableExists(db *sql.DB) {
 	stmt, _ := db.Prepare(createTable)
+	defer stmt.Close()
 	stmt.Exec()
+}
+
+// DeleteRecord : deletes the record with the given ID from the feel_recording table
+func DeleteRecord(id int) {
+	db := OpenDb()
+	defer db.Close()
+	db.Exec(deleteRecordPerID, id)
 }

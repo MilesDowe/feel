@@ -2,33 +2,35 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/milesdowe/feel/util"
+	"github.com/spf13/cobra"
 	"strconv"
 	"strings"
 	"time"
-	"github.com/milesdowe/feel/util"
-	"github.com/spf13/cobra"
 )
 
+// Cobra command creation details
 var logCmd = &cobra.Command{
 	Use:   "log",
 	Short: "Show log of entries",
 	Run: func(cmd *cobra.Command, args []string) {
-        util.VerifyDbExists()
 		printLog()
 	},
 }
 
 func init() {
-    rootCmd.AddCommand(logCmd)
+	rootCmd.AddCommand(logCmd)
 }
+
+// `log` command
 
 const getAllRecords = "SELECT id, score, concern, grateful, learn, entered FROM feel_recording"
 
 // PrintLog : outputs database records
-// TODO: catch uninitialized database
 func printLog() {
-    db := util.OpenDb()
+	db := util.OpenDb()
 	rows, _ := db.Query(getAllRecords)
+	defer rows.Close()
 
 	var id int
 	var score int
