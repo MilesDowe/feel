@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/google/go-cmp/cmp"
+	"github.com/milesdowe/feel/entity"
 	"github.com/milesdowe/feel/util"
 	"github.com/spf13/cobra"
 	"log"
@@ -39,15 +40,6 @@ func init() {
 
 // `now` command
 
-type entry struct {
-	ID       int
-	Score    string
-	Concern  string
-	Grateful string
-	Learn    string
-	Entered  int64
-}
-
 type date struct {
 	Year  int
 	Month time.Month
@@ -80,7 +72,7 @@ func getDateNow() date {
 }
 
 // prompts user for happiness details, returns results
-func readUserInput() entry {
+func readUserInput() entity.Entry {
 	reader := bufio.NewReader(os.Stdin)
 
 	fmt.Printf("How happy do you feel right now? Choose from %s (awful) to %s (great):\n", MaxStr, MinStr)
@@ -96,11 +88,11 @@ func readUserInput() entry {
 	learn, _ := reader.ReadString('\n')
 
 	// default id and entry date to -1, will be provided upon insert
-	return entry{-1, score, concern, grateful, learn, -1}
+	return entity.EntryWithUserInput(score, concern, grateful, learn)
 }
 
 // saves happiness details to the database
-func recordToDb(entry entry) {
+func recordToDb(entry entity.Entry) {
 	db := util.OpenDb()
 
 	entry.Score = checkScoreInput(entry.Score)
@@ -110,7 +102,7 @@ func recordToDb(entry entry) {
 	stmt.Exec(entry.Score, entry.Concern, entry.Grateful, entry.Learn, time.Now().Unix())
 }
 
-func checkForExistingEntry() entry {
+func checkForExistingEntry() entity.Entry {
 	// get the latest record
 	db := util.OpenDb()
 	rows, _ := db.Query(getRecentRecord)
@@ -129,12 +121,12 @@ func checkForExistingEntry() entry {
 	recordTime := getDateFromTime(entered)
 	nowTime := getDateNow()
 	if cmp.Equal(nowTime, recordTime) {
-		return entry{id, strconv.Itoa(score), concern, grateful, learn, entered}
+		return entity.EntryWithAllFields(id, strconv.Itoa(score), concern, grateful, learn, entered)
 	}
-	return entry{-1, "", "", "", "", -1}
+	return entity.EmptyEntry()
 }
 
-func overwriteEntry(entry entry) bool {
+func overwriteEntry(entry entity.Entry) bool {
 	fmt.Printf("An entry for today already exists:\n")
 	fmt.Printf("---------------------------------\n")
 	fmt.Printf("Score: %s\n", entry.Score)
