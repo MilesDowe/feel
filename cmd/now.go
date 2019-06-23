@@ -39,21 +39,6 @@ func init() {
 
 // `now` command
 
-const addRecord = "INSERT INTO feel_recording (score, concern, grateful, learn, entered) VALUES (?, ?, ?, ?, ?)"
-const getRecentRecord = "SELECT * FROM feel_recording where id = (select max(id) from feel_recording)"
-
-// Min : Lowest a happy score can be
-const Min = 1
-
-// Max : Highest a happy score can be
-const Max = 10
-
-// MinStr : String representation of Min
-var MinStr = strconv.Itoa(Min)
-
-// MaxStr : String representation of Max
-var MaxStr = strconv.Itoa(Max)
-
 type entry struct {
 	ID       int
 	Score    string
@@ -68,6 +53,21 @@ type date struct {
 	Month time.Month
 	Day   int
 }
+
+const addRecord = "INSERT INTO feel_recording (score, concern, grateful, learn, entered) VALUES (?, ?, ?, ?, ?)"
+const getRecentRecord = "SELECT * FROM feel_recording where id = (select max(id) from feel_recording)"
+
+// Min : Lowest a happy score can be
+const Min = 1
+
+// Max : Highest a happy score can be
+const Max = 10
+
+// MinStr : String representation of Min
+var MinStr = strconv.Itoa(Min)
+
+// MaxStr : String representation of Max
+var MaxStr = strconv.Itoa(Max)
 
 func getDateFromTime(unixTime int64) date {
 	t := time.Unix(unixTime, 0)
@@ -114,6 +114,7 @@ func checkForExistingEntry() entry {
 	// get the latest record
 	db := util.OpenDb()
 	rows, _ := db.Query(getRecentRecord)
+
 	defer rows.Close()
 
 	var id, score int
@@ -143,21 +144,7 @@ func overwriteEntry(entry entry) bool {
 	fmt.Printf("---------------------------------\n")
 	fmt.Printf("Delete it and enter a new one? [Y/n]: ")
 
-	return getUserConfirmation()
-}
-
-// TODO: put this in a general utility file
-func getUserConfirmation() bool {
-	reader := bufio.NewReader(os.Stdin)
-	response, _ := reader.ReadString('\n')
-
-	response = strings.TrimSpace(response)
-	response = strings.ToLower(response)
-
-	if response == "y" || response == "yes" {
-		return true
-	}
-	return false
+	return util.GetUserConfirmation()
 }
 
 // keep user's input score number within expected range
