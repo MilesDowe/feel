@@ -46,8 +46,18 @@ type date struct {
 	Day   int
 }
 
-const addRecord = "INSERT INTO feel_recording (score, concern, grateful, learn, entered) VALUES (?, ?, ?, ?, ?)"
-const getRecentRecord = "SELECT * FROM feel_recording where id = (select max(id) from feel_recording)"
+const addRecord = `
+INSERT INTO feel_recording
+(score, concern, grateful, learn, entered)
+VALUES (?, ?, ?, ?, ?)`
+
+const getRecentRecord = `
+SELECT *
+FROM feel_recording
+WHERE id = (
+    SELECT max(id)
+    FROM feel_recording
+)`
 
 // Min : Lowest a happy score can be
 const Min = 1

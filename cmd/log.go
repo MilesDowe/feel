@@ -24,7 +24,9 @@ func init() {
 
 // `log` command
 
-const getAllRecords = "SELECT id, score, concern, grateful, learn, entered FROM feel_recording"
+const getAllRecords = `
+SELECT id, score, concern, grateful, learn, entered
+FROM feel_recording`
 
 // PrintLog : outputs database records
 func printLog() {
