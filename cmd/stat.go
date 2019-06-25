@@ -5,7 +5,7 @@ import (
 	"github.com/milesdowe/feel/entity"
 	"github.com/milesdowe/feel/util"
 	"github.com/spf13/cobra"
-	"strconv"
+	"math"
 )
 
 // Cobra command creation details
@@ -15,12 +15,13 @@ var statCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		// get the data
 		var entries []entity.Entry
-
 		if ago > 0 {
-			populateEntries(entries, agoQuery)
+			entries = populateEntries(agoQuery)
 		} else {
-			populateEntries(entries, rangeQuery(begin, end))
+			entries = populateEntries(rangeQuery(begin, end))
 		}
+
+		printStats(entries)
 
 		// if export option provided, instead contruct a file
 		if export != "" {
@@ -35,22 +36,22 @@ var statCmd = &cobra.Command{
 	},
 }
 
-var export string
-
-var ago int
-
-var begin string
-
-var end string
+// Flags
+var (
+	export string
+	ago    int
+	begin  string
+	end    string
+)
 
 func init() {
 	statCmd.Flags().StringVarP(&export, "export", "x", "", "Output stats to a file. Available formats are: csv")
 
 	statCmd.Flags().IntVarP(&ago, "ago", "a", 0, "Get data for the last number of days provided.")
 
-	statCmd.Flags().StringVarP(&begin, "begin", "b", "", `The date to begin data review.
+	statCmd.Flags().StringVarP(&begin, "begin", "b", "", `The date to begin data review, as YYYYMMDD.
 Ignored if --ago flag is provided.`)
-	statCmd.Flags().StringVarP(&end, "end", "e", "", `The date to stop data review.
+	statCmd.Flags().StringVarP(&end, "end", "e", "", `The date to stop data review, as YYYYMMDD.
 Ignored if --ago flag is provided.`)
 
 	rootCmd.AddCommand(statCmd)
@@ -63,28 +64,36 @@ const (
 	agoQuery = allQuery + `WHERE entered`
 )
 
+func printStats(entries []entity.Entry) {
+	scores := make([]float64, len(entries))
+	for i := 0; i < len(entries); i++ {
+		scores[i] = float64(entries[i].Score)
+	}
+
+	fmt.Printf("Mean: %v\n", mean(scores))
+	fmt.Printf("Std.Dev.: %v\n", stddev(scores))
+}
+
 // populateEntries : adds entries from database to the provided array.
-func populateEntries(entries []entity.Entry, query string) {
+func populateEntries(query string) []entity.Entry {
+	result := []entity.Entry{}
+
 	db := util.OpenDb()
 	rows, _ := db.Query(query)
 
 	defer rows.Close()
 
-	var id int
-	var score int
-	var concern string
-	var grateful string
-	var learn string
-	var entered int64
+	var (
+		id, score                int
+		concern, grateful, learn string
+		entered                  int64
+	)
 
 	for rows.Next() {
 		rows.Scan(&id, &score, &concern, &grateful, &learn, &entered)
-		entries = append(entries, entity.EntryWithAllFields(id, strconv.Itoa(score), concern, grateful, learn, entered))
+		result = append(result, entity.EntryWithAllFields(id, score, concern, grateful, learn, entered))
 	}
-
-	for _, entry := range entries {
-		fmt.Println(entry.ID)
-	}
+	return result
 }
 
 // rangeQuery : Constructs a sql query for searching a date range. Gets all unless start and stop
@@ -95,7 +104,7 @@ func rangeQuery(begin, end string) string {
 	hasBegin := begin != ""
 	hasEnd := end != ""
 
-    const dbDate string = `strftime('%Y%m%d', entered, 'unixepoch', 'start of day')`
+	const dbDate string = `strftime('%Y%m%d', entered, 'unixepoch', 'start of day')`
 
 	if hasBegin || hasEnd {
 		result = result + `WHERE `
@@ -106,9 +115,39 @@ func rangeQuery(begin, end string) string {
 			}
 		}
 		if hasEnd {
-			result = result + dbDate +  ` <= '` + end + `'`
+			result = result + dbDate + ` <= '` + end + `'`
 		}
 	}
 	return result
 }
 
+func mean(data []float64) float64 {
+	var sum float64
+
+	for i := 0; i < len(data); i++ {
+		sum = sum + data[i]
+	}
+	return (sum / float64(len(data)))
+}
+
+/* Following function computes standard
+ * deviation of a data point
+ */
+func stddev(data []float64) float64 {
+	var dataMean, variance, temp float64
+
+	squaredData := make([]float64, len(data))
+
+	// Get the mean
+	dataMean = mean(data)
+
+	// Get distance from mean, then square each value
+	for i := 0; i < len(data); i++ {
+		temp = data[i] - dataMean
+		squaredData[i] = temp * temp
+	}
+
+	// Get the variance
+	variance = mean(squaredData)
+	return float64(math.Sqrt(float64(variance)))
+}

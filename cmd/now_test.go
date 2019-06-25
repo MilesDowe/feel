@@ -9,8 +9,8 @@ import (
 func TestCheckScoreInput_1(t *testing.T) {
 	got := checkScoreInput(strconv.Itoa(Min - 1))
 
-	if got != MinStr {
-		t.Errorf("score = %s, wanted %s", got, MinStr)
+	if got != Min {
+		t.Errorf("score = %v, wanted %v", got, Min)
 	}
 }
 
@@ -18,8 +18,8 @@ func TestCheckScoreInput_1(t *testing.T) {
 func TestCheckScoreInput_2(t *testing.T) {
 	got := checkScoreInput(strconv.Itoa(Max + 1))
 
-	if got != MaxStr {
-		t.Errorf("score = %s, wanted %s", got, MaxStr)
+	if got != Max {
+		t.Errorf("score = %v, wanted %v", got, Max)
 	}
 }
 
@@ -27,7 +27,7 @@ func TestCheckScoreInput_2(t *testing.T) {
 func TestCheckScoreInput_3(t *testing.T) {
 	got := checkScoreInput(" 5")
 
-	if got != "5" {
-		t.Errorf("score = %s, wanted 5", got)
+	if got != 5 {
+		t.Errorf("score = %v, wanted 5", got)
 	}
 }

@@ -3,7 +3,7 @@ package entity
 // Entry : a user's `feel` entry
 type Entry struct {
 	ID       int
-	Score    string
+	Score    int
 	Concern  string
 	Grateful string
 	Learn    string
@@ -14,7 +14,7 @@ type Entry struct {
 func EmptyEntry() Entry {
 	return Entry{
 		ID:       -1,
-		Score:    "",
+		Score:    -1,
 		Concern:  "",
 		Grateful: "",
 		Learn:    "",
@@ -23,7 +23,7 @@ func EmptyEntry() Entry {
 }
 
 // EntryWithUserInput : makes a new entry with the user's input
-func EntryWithUserInput(score, concern, grateful, learn string) Entry {
+func EntryWithUserInput(score int, concern, grateful, learn string) Entry {
 	return Entry{
 		ID:       -1,
 		Score:    score,
@@ -35,7 +35,7 @@ func EntryWithUserInput(score, concern, grateful, learn string) Entry {
 }
 
 // EntryWithAllFields : makes a new entry, setting all fields
-func EntryWithAllFields(id int, score, concern, grateful, learn string, entered int64) Entry {
+func EntryWithAllFields(id, score int, concern, grateful, learn string, entered int64) Entry {
 	return Entry{
 		ID:       id,
 		Score:    score,

@@ -47,17 +47,13 @@ type date struct {
 }
 
 const addRecord = `
-INSERT INTO feel_recording
-(score, concern, grateful, learn, entered)
+INSERT INTO feel_recording (score, concern, grateful, learn, entered)
 VALUES (?, ?, ?, ?, ?)`
 
 const getRecentRecord = `
 SELECT *
 FROM feel_recording
-WHERE id = (
-    SELECT max(id)
-    FROM feel_recording
-)`
+WHERE id = (SELECT max(id) FROM feel_recording)`
 
 // Min : Lowest a happy score can be
 const Min = 1
@@ -85,27 +81,28 @@ func getDateNow() date {
 func readUserInput() entity.Entry {
 	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Printf("How happy do you feel right now? Choose from %s (awful) to %s (great):\n", MaxStr, MinStr)
+	fmt.Printf("How happy do you feel right now? Choose from %s (awful) to %s (great):\n> ", MaxStr, MinStr)
 	score, _ := reader.ReadString('\n')
 
-	fmt.Printf("Anything have you concerned? (<enter> to skip)\n")
+	fmt.Printf("Anything have you concerned? (<enter> to skip)\n> ")
 	concern, _ := reader.ReadString('\n')
 
-	fmt.Printf("Do you feel grateful for anything? (<enter> to skip)\n")
+	fmt.Printf("Do you feel grateful for anything? (<enter> to skip)\n> ")
 	grateful, _ := reader.ReadString('\n')
 
-	fmt.Printf("Did you learn anything new today? (<enter> to skip)\n")
+	fmt.Printf("Did you learn anything new today? (<enter> to skip)\n> ")
 	learn, _ := reader.ReadString('\n')
 
+	// check provided score is in range
+	scoreNum := checkScoreInput(score)
+
 	// default id and entry date to -1, will be provided upon insert
-	return entity.EntryWithUserInput(score, concern, grateful, learn)
+	return entity.EntryWithUserInput(scoreNum, concern, grateful, learn)
 }
 
 // saves happiness details to the database
 func recordToDb(entry entity.Entry) {
 	db := util.OpenDb()
-
-	entry.Score = checkScoreInput(entry.Score)
 
 	stmt, _ := db.Prepare(addRecord)
 	defer stmt.Close()
@@ -131,7 +128,7 @@ func checkForExistingEntry() entity.Entry {
 	recordTime := getDateFromTime(entered)
 	nowTime := getDateNow()
 	if cmp.Equal(nowTime, recordTime) {
-		return entity.EntryWithAllFields(id, strconv.Itoa(score), concern, grateful, learn, entered)
+		return entity.EntryWithAllFields(id, score, concern, grateful, learn, entered)
 	}
 	return entity.EmptyEntry()
 }
@@ -139,10 +136,10 @@ func checkForExistingEntry() entity.Entry {
 func overwriteEntry(entry entity.Entry) bool {
 	fmt.Printf("An entry for today already exists:\n")
 	fmt.Printf("---------------------------------\n")
-	fmt.Printf("Score: %s\n", entry.Score)
-	fmt.Printf("Concern:\n%s", entry.Concern)
-	fmt.Printf("Grateful:\n%s", entry.Grateful)
-	fmt.Printf("Learned:\n%s", entry.Learn)
+	fmt.Printf("Score: %v\n", entry.Score)
+	fmt.Printf("Concern:\n> %v", entry.Concern)
+	fmt.Printf("Grateful:\n> %v", entry.Grateful)
+	fmt.Printf("Learned:\n> %v", entry.Learn)
 	fmt.Printf("---------------------------------\n")
 	fmt.Printf("Delete it and enter a new one? [Y/n]: ")
 
@@ -150,19 +147,19 @@ func overwriteEntry(entry entity.Entry) bool {
 }
 
 // keep user's input score number within expected range
-func checkScoreInput(score string) string {
+func checkScoreInput(score string) int {
 	score = strings.TrimSpace(score)
-	i, err := strconv.Atoi(score)
+	result, err := strconv.Atoi(score)
 
 	if err != nil {
 		log.Fatal(err)
 		os.Exit(1)
 	}
 
-	if i < Min {
-		score = MinStr
-	} else if i > Max {
-		score = MaxStr
+	if result < Min {
+		result = Min
+	} else if result > Max {
+		result = Max
 	}
-	return score
+	return result
 }
