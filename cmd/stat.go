@@ -24,6 +24,8 @@ var statCmd = &cobra.Command{
 
 		// if export option provided, contruct a file
 		if export != "" {
+            // TODO: think about if we should just print the format and have the user pipe it
+            //       to a file if they want.
 			switch export {
 			case "csv":
 				// ...

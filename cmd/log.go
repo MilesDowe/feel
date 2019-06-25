@@ -44,16 +44,16 @@ func printLog() {
 	for rows.Next() {
 		rows.Scan(&id, &score, &concern, &grateful, &learn, &entered)
 
-		fmt.Println("Date: " + time.Unix(entered, 0).String())
-		fmt.Println("Score: " + strconv.Itoa(score))
+		fmt.Printf("Date: %v\n", time.Unix(entered, 0).String())
+		fmt.Printf("Score: %v\n", strconv.Itoa(score))
 		if given(concern) {
-			fmt.Printf("Concerned:\n> %v", concern)
+			fmt.Printf("Concerned:\n> %v\n", concern)
 		}
 		if given(grateful) {
-			fmt.Printf("Grateful:\n> %v", grateful)
+			fmt.Printf("Grateful:\n> %v\n", grateful)
 		}
 		if given(learn) {
-			fmt.Printf("Learned:\n> %v", learn)
+			fmt.Printf("Learned:\n> %v\n", learn)
 		}
 		fmt.Println()
 	}

@@ -142,9 +142,9 @@ func overwriteEntry(entry entity.Entry) bool {
 	fmt.Printf("An entry for today already exists:\n")
 	fmt.Printf("---------------------------------\n")
 	fmt.Printf("Score: %v\n", entry.Score)
-	fmt.Printf("Concern:\n> %v", entry.Concern)
-	fmt.Printf("Grateful:\n> %v", entry.Grateful)
-	fmt.Printf("Learned:\n> %v", entry.Learn)
+	fmt.Printf("Concern:\n> %v\n", entry.Concern)
+	fmt.Printf("Grateful:\n> %v\n", entry.Grateful)
+	fmt.Printf("Learned:\n> %v\n", entry.Learn)
 	fmt.Printf("---------------------------------\n")
 	fmt.Printf("Delete it and enter a new one? [Y/n]: ")
 
