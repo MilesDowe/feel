@@ -6,6 +6,7 @@ import (
 	"github.com/milesdowe/feel/util"
 	"github.com/spf13/cobra"
 	"math"
+	"strconv"
 	"strings"
 )
 
@@ -17,15 +18,15 @@ var statCmd = &cobra.Command{
 		// get the data
 		var entries []entity.Entry
 		if ago > 0 {
-			entries = populateEntries(agoQuery)
+			entries = populateEntries(agoQuery(ago))
 		} else {
 			entries = populateEntries(rangeQuery(begin, end))
 		}
 
 		// if export option provided, contruct a file
 		if export != "" {
-            // TODO: think about if we should just print the format and have the user pipe it
-            //       to a file if they want.
+			// TODO: think about if we should just print the format and have the user pipe it
+			//       to a file if they want.
 			switch export {
 			case "csv":
 				// ...
@@ -64,10 +65,7 @@ Ignored if --ago flag is provided.`)
 
 // `stat` command
 
-const (
-	allQuery = `SELECT * from feel_recording `
-	agoQuery = allQuery + `WHERE entered`
-)
+const allQuery = `SELECT * from feel_recording `
 
 func printStats(entries []entity.Entry) {
 	scores := make([]float64, len(entries))
@@ -136,6 +134,12 @@ func populateEntries(query string) []entity.Entry {
 		result = append(result, entity.EntryWithAllFields(id, score, concern, grateful, learn, entered))
 	}
 	return result
+}
+
+func agoQuery(days int) string {
+	daysStr := strconv.Itoa(days)
+	return allQuery + "WHERE date(entered, 'unixepoch') >= date('now', 'start of day', '-" +
+		daysStr + " day')"
 }
 
 // rangeQuery : Constructs a sql query for searching a date range. Gets all unless start and stop
