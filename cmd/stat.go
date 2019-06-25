@@ -22,17 +22,19 @@ var statCmd = &cobra.Command{
 			entries = populateEntries(rangeQuery(begin, end))
 		}
 
-		printStats(entries)
-
-		// if export option provided, instead contruct a file
+		// if export option provided, contruct a file
 		if export != "" {
 			switch export {
 			case "csv":
 				// ...
 				fmt.Println("Saved to feel.csv")
+			default:
+				fmt.Printf("Format %v unrecognized\n", export)
 			}
+
 		} else {
-			// print the data
+			// else, print the data
+			printStats(entries)
 		}
 	},
 }
