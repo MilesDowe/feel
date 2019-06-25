@@ -73,8 +73,12 @@ func printStats(entries []entity.Entry) {
 	filledLearn := 0
 
 	for i := 0; i < len(entries); i++ {
+		// get an slice of scores for central tendency calculation
 		scores[i] = float64(entries[i].Score)
 
+		// get counts of times extra details were provided
+		//   may be useful to see how commonly a user tends to report
+		//   a particular factor
 		if strings.TrimSpace(entries[i].Concern) != "" {
 			filledConcern++
 		}
@@ -84,6 +88,9 @@ func printStats(entries []entity.Entry) {
 		if strings.TrimSpace(entries[i].Learn) != "" {
 			filledLearn++
 		}
+
+		// TODO: Do something with the text. Something simple, like most reported words, or complex,
+		//       like categorizing inputs (e.g., seeing how many "concerns" are work-related)
 	}
 
 	fmt.Printf("Your happiness at a glance:\n")
@@ -93,9 +100,16 @@ func printStats(entries []entity.Entry) {
 
 	fmt.Printf("Details provided:\n")
 	fmt.Printf("---------------------------\n")
-	fmt.Printf("Times \"concerned\" provided: %v/%v\n", filledConcern, len(scores))
-	fmt.Printf("Times \"grateful\" provided: %v/%v\n", filledGrateful, len(scores))
-	fmt.Printf("Times \"learned\" provided: %v/%v\n", filledLearn, len(scores))
+	fmt.Printf("\"Concerned\" provided: %v (%.1f%%)\n",
+		filledConcern, percent(filledConcern, len(scores)))
+	fmt.Printf("\"Grateful\" provided: %v (%.1f%%)\n",
+		filledGrateful, percent(filledGrateful, len(scores)))
+	fmt.Printf("\"Learned\" provided: %v (%.1f%%)\n",
+		filledLearn, percent(filledLearn, len(scores)))
+}
+
+func percent(numer, denom int) float64 {
+	return float64(numer) / float64(denom) * 100
 }
 
 // populateEntries : adds entries from database to the provided array.
@@ -122,6 +136,7 @@ func populateEntries(query string) []entity.Entry {
 
 // rangeQuery : Constructs a sql query for searching a date range. Gets all unless start and stop
 // times are given.
+// TODO: fix localization issue
 func rangeQuery(begin, end string) string {
 	result := allQuery
 

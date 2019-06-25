@@ -46,18 +46,20 @@ func printLog() {
 
 		fmt.Println("Date: " + time.Unix(entered, 0).String())
 		fmt.Println("Score: " + strconv.Itoa(score))
-		fmt.Println("Concerned: " + format(concern))
-		fmt.Println("Grateful: " + format(grateful))
-		fmt.Println("Learned: " + format(learn))
+		if given(concern) {
+			fmt.Printf("Concerned:\n> %v", concern)
+		}
+		if given(grateful) {
+			fmt.Printf("Grateful:\n> %v", grateful)
+		}
+		if given(learn) {
+			fmt.Printf("Learned:\n> %v", learn)
+		}
 		fmt.Println()
 	}
 }
 
-func format(in string) string {
+func given(in string) bool {
 	result := strings.TrimSpace(in)
-
-	if result == "" {
-		return "<skipped>"
-	}
-	return result
+	return result != ""
 }
