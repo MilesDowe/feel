@@ -67,7 +67,7 @@ var MinStr = strconv.Itoa(Min)
 // MaxStr : String representation of Max
 var MaxStr = strconv.Itoa(Max)
 
-func getDateFromTime(unixTime int64) date {
+func getDateFromUnixTime(unixTime int64) date {
 	t := time.Unix(unixTime, 0)
 	return date{t.Year(), t.Month(), t.Day()}
 }
@@ -97,7 +97,12 @@ func readUserInput() entity.Entry {
 	scoreNum := checkScoreInput(score)
 
 	// default id and entry date to -1, will be provided upon insert
-	return entity.EntryWithUserInput(scoreNum, concern, grateful, learn)
+	return entity.EntryWithUserInput(
+		scoreNum,
+		strings.TrimSpace(concern),
+		strings.TrimSpace(grateful),
+		strings.TrimSpace(learn),
+	)
 }
 
 // saves happiness details to the database
@@ -125,7 +130,7 @@ func checkForExistingEntry() entity.Entry {
 	}
 
 	// if it was entered today, provide the details
-	recordTime := getDateFromTime(entered)
+	recordTime := getDateFromUnixTime(entered)
 	nowTime := getDateNow()
 	if cmp.Equal(nowTime, recordTime) {
 		return entity.EntryWithAllFields(id, score, concern, grateful, learn, entered)

@@ -6,6 +6,7 @@ import (
 	"github.com/milesdowe/feel/util"
 	"github.com/spf13/cobra"
 	"math"
+	"strings"
 )
 
 // Cobra command creation details
@@ -66,12 +67,35 @@ const (
 
 func printStats(entries []entity.Entry) {
 	scores := make([]float64, len(entries))
+
+	filledConcern := 0
+	filledGrateful := 0
+	filledLearn := 0
+
 	for i := 0; i < len(entries); i++ {
 		scores[i] = float64(entries[i].Score)
+
+		if strings.TrimSpace(entries[i].Concern) != "" {
+			filledConcern++
+		}
+		if strings.TrimSpace(entries[i].Grateful) != "" {
+			filledGrateful++
+		}
+		if strings.TrimSpace(entries[i].Learn) != "" {
+			filledLearn++
+		}
 	}
 
-	fmt.Printf("Mean: %v\n", mean(scores))
-	fmt.Printf("Std.Dev.: %v\n", stddev(scores))
+	fmt.Printf("Your happiness at a glance:\n")
+	fmt.Printf("---------------------------\n")
+	fmt.Printf("Mean: %.2f\n", mean(scores))
+	fmt.Printf("Std.Dev.: %.2f\n\n", stddev(scores))
+
+	fmt.Printf("Details provided:\n")
+	fmt.Printf("---------------------------\n")
+	fmt.Printf("Times \"concerned\" provided: %v/%v\n", filledConcern, len(scores))
+	fmt.Printf("Times \"grateful\" provided: %v/%v\n", filledGrateful, len(scores))
+	fmt.Printf("Times \"learned\" provided: %v/%v\n", filledLearn, len(scores))
 }
 
 // populateEntries : adds entries from database to the provided array.

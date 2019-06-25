@@ -34,12 +34,11 @@ func printLog() {
 	rows, _ := db.Query(getAllRecords)
 	defer rows.Close()
 
-	var id int
-	var score int
-	var concern string
-	var grateful string
-	var learn string
-	var entered int64
+	var (
+		id, score                int
+		concern, grateful, learn string
+		entered                  int64
+	)
 
 	fmt.Println()
 	for rows.Next() {
@@ -55,7 +54,7 @@ func printLog() {
 }
 
 func format(in string) string {
-	result := strings.Trim(in, " \n")
+	result := strings.TrimSpace(in)
 
 	if result == "" {
 		return "<skipped>"
