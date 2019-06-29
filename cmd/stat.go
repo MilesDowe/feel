@@ -4,23 +4,43 @@ import (
 	"fmt"
 	"github.com/milesdowe/feel/entity"
 	"github.com/milesdowe/feel/util"
+	"github.com/montanaflynn/stats"
 	"github.com/spf13/cobra"
 	"strconv"
 	"strings"
 )
 
+//
+// Constants and structs
+//
+type entrySet []entity.Entry
+
+type collectedData struct {
+	scores      []float64
+	concernCnt  int
+	gratefulCnt int
+	learnCnt    int
+}
+
+const allQuery = `SELECT * from feel_recording `
+
+//
 // Cobra command creation details
+//
 var statCmd = &cobra.Command{
 	Use:   "stat",
 	Short: "View and export stats from your history of entries",
 	Run: func(cmd *cobra.Command, args []string) {
-		// get the data
-		var entries []entity.Entry
+		// get database records, depending on user input (all or date range)
+		var entries entrySet
 		if ago > 0 {
 			entries = populateEntries(agoQuery(ago))
 		} else {
 			entries = populateEntries(rangeQuery(begin, end))
 		}
+
+		// aggregate data we are interested in
+		data := getRelevantEntryData(entries)
 
 		// if export option provided, contruct a file
 		if export != "" {
@@ -36,7 +56,7 @@ var statCmd = &cobra.Command{
 
 		} else {
 			// else, print the data
-			printStats(entries)
+			printStats(data)
 		}
 	},
 }
@@ -62,16 +82,42 @@ Ignored if --ago flag is provided.`)
 	rootCmd.AddCommand(statCmd)
 }
 
+//
 // `stat` command
+//
+func printStats(data collectedData) {
+	mean, _ := stats.Mean(data.scores)
+	stddev, _ := stats.StdDevS(data.scores)
 
-const allQuery = `SELECT * from feel_recording `
+	printHeader("Your happiness at a glance")
+	fmt.Printf("Mean    : %.2f\n", mean)
+	fmt.Printf("Std.Dev.: %.2f\n\n", stddev)
 
-func printStats(entries []entity.Entry) {
+	printHeader("Details summary")
+	printProvided("Concerned", data.concernCnt, data.scores)
+	printProvided("Grateful", data.gratefulCnt, data.scores)
+	printProvided("Learned", data.learnCnt, data.scores)
+}
+
+func printHeader(title string) {
+	fmt.Printf("## %v\n\n", title)
+}
+
+func printProvided(category string, count int, scores []float64) {
+	fmt.Printf("\"%v\" provided: %v (%.1f%%)\n", category, count, percent(count, len(scores)))
+}
+
+func percent(numer, denom int) float64 {
+	return float64(numer) / float64(denom) * 100
+}
+
+func getRelevantEntryData(entries entrySet) collectedData {
+
 	scores := make([]float64, len(entries))
 
-	filledConcern := 0
-	filledGrateful := 0
-	filledLearn := 0
+	concernCnt := 0
+	gratefulCnt := 0
+	learnCnt := 0
 
 	for i := 0; i < len(entries); i++ {
 		// get an slice of scores for central tendency calculation
@@ -81,38 +127,20 @@ func printStats(entries []entity.Entry) {
 		//   may be useful to see how commonly a user tends to report
 		//   a particular factor
 		if strings.TrimSpace(entries[i].Concern) != "" {
-			filledConcern++
+			concernCnt++
 		}
 		if strings.TrimSpace(entries[i].Grateful) != "" {
-			filledGrateful++
+			gratefulCnt++
 		}
 		if strings.TrimSpace(entries[i].Learn) != "" {
-			filledLearn++
+			learnCnt++
 		}
 
 		// TODO: Do something with the text. Something simple, like most reported words, or complex,
 		//       like categorizing inputs (e.g., seeing how many "concerns" are work-related)
 	}
 
-	fmt.Printf("---------------------------\n")
-	fmt.Printf("Your happiness at a glance:\n")
-	fmt.Printf("---------------------------\n")
-	fmt.Printf("Mean    : %.2f\n", util.Mean(scores))
-	fmt.Printf("Std.Dev.: %.2f\n\n", util.StdDev(scores))
-
-	fmt.Printf("---------------------------\n")
-	fmt.Printf("Details summary:\n")
-	fmt.Printf("---------------------------\n")
-	fmt.Printf("\"Concerned\" provided: %v (%.1f%%)\n",
-		filledConcern, percent(filledConcern, len(scores)))
-	fmt.Printf("\"Grateful\" provided : %v (%.1f%%)\n",
-		filledGrateful, percent(filledGrateful, len(scores)))
-	fmt.Printf("\"Learned\" provided  : %v (%.1f%%)\n",
-		filledLearn, percent(filledLearn, len(scores)))
-}
-
-func percent(numer, denom int) float64 {
-	return float64(numer) / float64(denom) * 100
+	return collectedData{scores, concernCnt, gratefulCnt, learnCnt}
 }
 
 // populateEntries : adds entries from database to the provided array.
@@ -137,14 +165,14 @@ func populateEntries(query string) []entity.Entry {
 	return result
 }
 
+// agoQuery : Expands select-all query to limit the number of days ago.
 func agoQuery(days int) string {
 	daysStr := strconv.Itoa(days)
 	return allQuery + "WHERE date(entered, 'unixepoch') >= date('now', 'start of day', '-" +
 		daysStr + " day')"
 }
 
-// rangeQuery : Constructs a sql query for searching a date range. Gets all unless start and stop
-// times are given.
+// rangeQuery : Expands select-all query to include a date range.
 // TODO: fix localization issue
 func rangeQuery(begin, end string) string {
 	result := allQuery
