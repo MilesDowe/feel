@@ -1,11 +1,11 @@
-package cmd
+package util
 
 import (
     "testing"
 )
 
 func TestMean(t *testing.T) {
-    got := mean([]float64{1, 2, 3, 4, 5})
+    got := Mean([]float64{1, 2, 3, 4, 5})
 
     expected := 3.0
 
@@ -14,8 +14,8 @@ func TestMean(t *testing.T) {
     }
 }
 
-func TestStddev(t *testing.T) {
-    got := stddev([]float64{1, 2, 3, 4, 5})
+func TestStdDev(t *testing.T) {
+    got := StdDev([]float64{1, 2, 3, 4, 5})
 
     expected := 1.4142135623730951
 

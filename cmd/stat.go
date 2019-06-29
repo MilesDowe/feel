@@ -5,7 +5,6 @@ import (
 	"github.com/milesdowe/feel/entity"
 	"github.com/milesdowe/feel/util"
 	"github.com/spf13/cobra"
-	"math"
 	"strconv"
 	"strings"
 )
@@ -95,18 +94,20 @@ func printStats(entries []entity.Entry) {
 		//       like categorizing inputs (e.g., seeing how many "concerns" are work-related)
 	}
 
+	fmt.Printf("---------------------------\n")
 	fmt.Printf("Your happiness at a glance:\n")
 	fmt.Printf("---------------------------\n")
-	fmt.Printf("Mean: %.2f\n", mean(scores))
-	fmt.Printf("Std.Dev.: %.2f\n\n", stddev(scores))
+	fmt.Printf("Mean    : %.2f\n", util.Mean(scores))
+	fmt.Printf("Std.Dev.: %.2f\n\n", util.StdDev(scores))
 
-	fmt.Printf("Details provided:\n")
+	fmt.Printf("---------------------------\n")
+	fmt.Printf("Details summary:\n")
 	fmt.Printf("---------------------------\n")
 	fmt.Printf("\"Concerned\" provided: %v (%.1f%%)\n",
 		filledConcern, percent(filledConcern, len(scores)))
-	fmt.Printf("\"Grateful\" provided: %v (%.1f%%)\n",
+	fmt.Printf("\"Grateful\" provided : %v (%.1f%%)\n",
 		filledGrateful, percent(filledGrateful, len(scores)))
-	fmt.Printf("\"Learned\" provided: %v (%.1f%%)\n",
+	fmt.Printf("\"Learned\" provided  : %v (%.1f%%)\n",
 		filledLearn, percent(filledLearn, len(scores)))
 }
 
@@ -166,35 +167,4 @@ func rangeQuery(begin, end string) string {
 		}
 	}
 	return result
-}
-
-func mean(data []float64) float64 {
-	var sum float64
-
-	for i := 0; i < len(data); i++ {
-		sum = sum + data[i]
-	}
-	return (sum / float64(len(data)))
-}
-
-/* Following function computes standard
- * deviation of a data point
- */
-func stddev(data []float64) float64 {
-	var dataMean, variance, temp float64
-
-	squaredData := make([]float64, len(data))
-
-	// Get the mean
-	dataMean = mean(data)
-
-	// Get distance from mean, then square each value
-	for i := 0; i < len(data); i++ {
-		temp = data[i] - dataMean
-		squaredData[i] = temp * temp
-	}
-
-	// Get the variance
-	variance = mean(squaredData)
-	return float64(math.Sqrt(float64(variance)))
 }
