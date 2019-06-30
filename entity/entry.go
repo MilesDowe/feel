@@ -1,5 +1,9 @@
 package entity
 
+import (
+	"fmt"
+)
+
 // Entry : a user's `feel` entry
 type Entry struct {
 	ID       int
@@ -44,4 +48,9 @@ func EntryWithAllFields(id, score int, concern, grateful, learn string, entered 
 		Learn:    learn,
 		Entered:  entered,
 	}
+}
+
+// PrintEntry : Prints the Entry struct
+func PrintEntry(entry Entry) {
+	fmt.Printf("%+v\n", entry)
 }

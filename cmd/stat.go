@@ -39,23 +39,20 @@ var statCmd = &cobra.Command{
 			entries = populateEntries(rangeQuery(begin, end))
 		}
 
-		// aggregate data we are interested in
-		data := getRelevantEntryData(entries)
-
 		// if export option provided, contruct a file
 		if export != "" {
 			// TODO: think about if we should just print the format and have the user pipe it
 			//       to a file if they want.
 			switch export {
 			case "csv":
-				// ...
-				fmt.Println("Saved to feel.csv")
+				printCsv(entries)
 			default:
 				fmt.Printf("Format %v unrecognized\n", export)
 			}
 
 		} else {
-			// else, print the data
+			// else, aggregate summary data and print
+			data := getRelevantEntryData(entries)
 			printStats(data)
 		}
 	},
@@ -163,6 +160,20 @@ func populateEntries(query string) []entity.Entry {
 		result = append(result, entity.EntryWithAllFields(id, score, concern, grateful, learn, entered))
 	}
 	return result
+}
+
+func printCsv(entries entrySet) {
+	fmt.Printf("\"id\",\"score\",\"concerned\",\"grateful\",\"learned\",\"entered\"\n")
+	for i := 0; i < len(entries); i++ {
+		fmt.Printf(
+			"\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
+			strconv.Itoa(entries[i].ID),
+			strconv.Itoa(entries[i].Score),
+			entries[i].Concern,
+			entries[i].Grateful,
+			entries[i].Learn,
+			strconv.FormatInt(entries[i].Entered, 10))
+	}
 }
 
 // agoQuery : Expands select-all query to limit the number of days ago.
