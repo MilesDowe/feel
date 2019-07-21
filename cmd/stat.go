@@ -16,13 +16,16 @@ import (
 type entrySet []entity.Entry
 
 type collectedData struct {
-	scores      []float64
-	concernCnt  int
-	gratefulCnt int
-	learnCnt    int
+	scores       []float64
+	concernCnt   int
+	gratefulCnt  int
+	learnCnt     int
+	milestoneCnt int
 }
 
-const allQuery = `SELECT * from feel_recording `
+const allQuery = `
+SELECT id, score, concern, grateful, learn, milestone, entered
+from feel_recording `
 
 //
 // Cobra command creation details
@@ -94,6 +97,7 @@ func printStats(data collectedData) {
 	printProvided("Concerned", data.concernCnt, data.scores)
 	printProvided("Grateful", data.gratefulCnt, data.scores)
 	printProvided("Learned", data.learnCnt, data.scores)
+	printProvided("Milestones", data.milestoneCnt, data.scores)
 }
 
 func printHeader(title string) {
@@ -101,7 +105,7 @@ func printHeader(title string) {
 }
 
 func printProvided(category string, count int, scores []float64) {
-	fmt.Printf("\"%v\" provided: %v (%.1f%%)\n", category, count, percent(count, len(scores)))
+	fmt.Printf("%v provided: %v (%.1f%%)\n", category, count, percent(count, len(scores)))
 }
 
 func percent(numer, denom int) float64 {
@@ -115,6 +119,7 @@ func getRelevantEntryData(entries entrySet) collectedData {
 	concernCnt := 0
 	gratefulCnt := 0
 	learnCnt := 0
+	milestoneCnt := 0
 
 	for i := 0; i < len(entries); i++ {
 		// get an slice of scores for central tendency calculation
@@ -123,21 +128,23 @@ func getRelevantEntryData(entries entrySet) collectedData {
 		// get counts of times extra details were provided
 		//   may be useful to see how commonly a user tends to report
 		//   a particular factor
-		if strings.TrimSpace(entries[i].Concern) != "" {
-			concernCnt++
-		}
-		if strings.TrimSpace(entries[i].Grateful) != "" {
-			gratefulCnt++
-		}
-		if strings.TrimSpace(entries[i].Learn) != "" {
-			learnCnt++
-		}
+		concernCnt = incrementCount(entries[i].Concern, concernCnt)
+		gratefulCnt = incrementCount(entries[i].Grateful, gratefulCnt)
+		learnCnt = incrementCount(entries[i].Learn, learnCnt)
+		milestoneCnt = incrementCount(entries[i].Milestone, milestoneCnt)
 
 		// TODO: Do something with the text. Something simple, like most reported words, or complex,
 		//       like categorizing inputs (e.g., seeing how many "concerns" are work-related)
 	}
 
-	return collectedData{scores, concernCnt, gratefulCnt, learnCnt}
+	return collectedData{scores, concernCnt, gratefulCnt, learnCnt, milestoneCnt}
+}
+
+func incrementCount(value string, cnt int) int {
+	if strings.TrimSpace(value) != "" {
+		cnt++
+	}
+	return cnt
 }
 
 // populateEntries : adds entries from database to the provided array.
@@ -170,10 +177,10 @@ func printCsv(entries entrySet) {
 			"\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
 			strconv.Itoa(entries[i].ID),
 			strconv.Itoa(entries[i].Score),
-			strings.ReplaceAll(entries[i].Concern, "\"", "\\\""),  // escape quotes since we
-			strings.ReplaceAll(entries[i].Grateful, "\"", "\\\""), // used them to encapsulate
-			strings.ReplaceAll(entries[i].Learn, "\"", "\\\""),    // the text
-			strings.ReplaceAll(entries[i].Milestone, "\"", "\\\""),    // the text
+			strings.ReplaceAll(entries[i].Concern, "\"", "\\\""),   // escape quotes since we
+			strings.ReplaceAll(entries[i].Grateful, "\"", "\\\""),  // used them to encapsulate
+			strings.ReplaceAll(entries[i].Learn, "\"", "\\\""),     // the text
+			strings.ReplaceAll(entries[i].Milestone, "\"", "\\\""), // the text
 			strconv.FormatInt(entries[i].Entered, 10))
 	}
 }
