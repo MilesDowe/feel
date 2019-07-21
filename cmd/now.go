@@ -51,7 +51,7 @@ INSERT INTO feel_recording (score, concern, grateful, learn, milestone, entered)
 VALUES (?, ?, ?, ?, ?, ?)`
 
 const getRecentRecord = `
-SELECT *
+SELECT id, score, concern, grateful, learn, milestone, entered
 FROM feel_recording
 WHERE id = (SELECT max(id) FROM feel_recording)`
 
@@ -147,7 +147,7 @@ func checkForExistingEntry() entity.Entry {
 func overwriteEntry(entry entity.Entry) bool {
 	fmt.Printf("An entry for today already exists:\n")
 	fmt.Printf("---------------------------------\n")
-	fmt.Printf("Score: %v\n", entry.Score)
+	fmt.Printf("Score:\n> %v\n", entry.Score)
 	fmt.Printf("Concern:\n> %v\n", entry.Concern)
 	fmt.Printf("Grateful:\n> %v\n", entry.Grateful)
 	fmt.Printf("Learned:\n> %v\n", entry.Learn)

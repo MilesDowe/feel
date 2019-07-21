@@ -122,12 +122,10 @@ func getRelevantEntryData(entries entrySet) collectedData {
 	milestoneCnt := 0
 
 	for i := 0; i < len(entries); i++ {
-		// get an slice of scores for central tendency calculation
+		// get an slice of scores for central tendency
 		scores[i] = float64(entries[i].Score)
 
 		// get counts of times extra details were provided
-		//   may be useful to see how commonly a user tends to report
-		//   a particular factor
 		concernCnt = incrementCount(entries[i].Concern, concernCnt)
 		gratefulCnt = incrementCount(entries[i].Grateful, gratefulCnt)
 		learnCnt = incrementCount(entries[i].Learn, learnCnt)
