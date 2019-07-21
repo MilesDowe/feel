@@ -42,10 +42,8 @@ var statCmd = &cobra.Command{
 			entries = populateEntries(rangeQuery(begin, end))
 		}
 
-		// if export option provided, contruct a file
+		// if export option provided, print to stdout
 		if export != "" {
-			// TODO: think about if we should just print the format and have the user pipe it
-			//       to a file if they want.
 			switch export {
 			case "csv":
 				printCsv(entries)
