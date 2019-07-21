@@ -16,6 +16,7 @@ const createTable = "CREATE TABLE IF NOT EXISTS feel_recording (" +
 	"concern TEXT NULLABLE," +
 	"grateful TEXT NULLABLE," +
 	"learn TEXT NULLABLE," +
+	"milestone TEXT NULLABLE," +
 	"entered INTEGER)"
 
 const deleteRecordPerID = "DELETE FROM feel_recording WHERE id = ?"

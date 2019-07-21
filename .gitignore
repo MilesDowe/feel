@@ -1,3 +1,6 @@
 # Ignore compiled items
 feel.exe
 feel.db
+
+# IDE stuff
+*.un~

@@ -150,29 +150,30 @@ func populateEntries(query string) []entity.Entry {
 	defer rows.Close()
 
 	var (
-		id, score                int
-		concern, grateful, learn string
-		entered                  int64
+		id, score                           int
+		concern, grateful, learn, milestone string
+		entered                             int64
 	)
 
 	for rows.Next() {
-		rows.Scan(&id, &score, &concern, &grateful, &learn, &entered)
-		result = append(result, entity.EntryWithAllFields(id, score, concern, grateful, learn, entered))
+		rows.Scan(&id, &score, &concern, &grateful, &learn, &milestone, &entered)
+		result = append(result, entity.EntryWithAllFields(id, score, concern, grateful, learn, milestone, entered))
 	}
 	return result
 }
 
 // printCsv : for use in `export` flag, prints to stdout
 func printCsv(entries entrySet) {
-	fmt.Printf("\"id\",\"score\",\"concerned\",\"grateful\",\"learned\",\"entered\"\n")
+	fmt.Printf("\"id\",\"score\",\"concerned\",\"grateful\",\"learned\",\"milestone\",\"entered\"\n")
 	for i := 0; i < len(entries); i++ {
 		fmt.Printf(
-			"\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
+			"\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
 			strconv.Itoa(entries[i].ID),
 			strconv.Itoa(entries[i].Score),
-			strings.ReplaceAll(entries[i].Concern, "\"", "\\\""),   // escape quotes since we
-			strings.ReplaceAll(entries[i].Grateful, "\"", "\\\""),  // used them to encapsulate
-			strings.ReplaceAll(entries[i].Learn, "\"", "\\\""),     // the text
+			strings.ReplaceAll(entries[i].Concern, "\"", "\\\""),  // escape quotes since we
+			strings.ReplaceAll(entries[i].Grateful, "\"", "\\\""), // used them to encapsulate
+			strings.ReplaceAll(entries[i].Learn, "\"", "\\\""),    // the text
+			strings.ReplaceAll(entries[i].Milestone, "\"", "\\\""),    // the text
 			strconv.FormatInt(entries[i].Entered, 10))
 	}
 }

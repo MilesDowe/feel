@@ -47,8 +47,8 @@ type date struct {
 }
 
 const addRecord = `
-INSERT INTO feel_recording (score, concern, grateful, learn, entered)
-VALUES (?, ?, ?, ?, ?)`
+INSERT INTO feel_recording (score, concern, grateful, learn, milestone, entered)
+VALUES (?, ?, ?, ?, ?, ?)`
 
 const getRecentRecord = `
 SELECT *
@@ -81,17 +81,22 @@ func getDateNow() date {
 func readUserInput() entity.Entry {
 	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Printf("How happy do you feel right now? Choose from %s (awful) to %s (great):\n> ", MaxStr, MinStr)
+	skipNotice := " (<enter> to skip)\n> "
+
+	fmt.Printf("How happy do you feel right now? Choose from %s (awful) to %s (great):\n> ", MinStr, MaxStr)
 	score, _ := reader.ReadString('\n')
 
-	fmt.Printf("Anything have you concerned? (<enter> to skip)\n> ")
+	fmt.Printf("Anything have you concerned?" + skipNotice)
 	concern, _ := reader.ReadString('\n')
 
-	fmt.Printf("Do you feel grateful for anything? (<enter> to skip)\n> ")
+	fmt.Printf("Do you feel grateful for anything?" + skipNotice)
 	grateful, _ := reader.ReadString('\n')
 
-	fmt.Printf("Did you learn anything new today? (<enter> to skip)\n> ")
+	fmt.Printf("Did you learn anything new today?" + skipNotice)
 	learn, _ := reader.ReadString('\n')
+
+	fmt.Printf("Any noteable milestones?" + skipNotice)
+	milestone, _ := reader.ReadString('\n')
 
 	// check provided score is in range
 	scoreNum := checkScoreInput(score)
@@ -102,6 +107,7 @@ func readUserInput() entity.Entry {
 		strings.TrimSpace(concern),
 		strings.TrimSpace(grateful),
 		strings.TrimSpace(learn),
+		strings.TrimSpace(milestone),
 	)
 }
 
@@ -111,7 +117,7 @@ func recordToDb(entry entity.Entry) {
 
 	stmt, _ := db.Prepare(addRecord)
 	defer stmt.Close()
-	stmt.Exec(entry.Score, entry.Concern, entry.Grateful, entry.Learn, time.Now().Unix())
+	stmt.Exec(entry.Score, entry.Concern, entry.Grateful, entry.Learn, entry.Milestone, time.Now().Unix())
 }
 
 func checkForExistingEntry() entity.Entry {
@@ -122,18 +128,18 @@ func checkForExistingEntry() entity.Entry {
 	defer rows.Close()
 
 	var id, score int
-	var concern, grateful, learn string
+	var concern, grateful, learn, milestone string
 	var entered int64
 
 	for rows.Next() {
-		rows.Scan(&id, &score, &concern, &grateful, &learn, &entered)
+		rows.Scan(&id, &score, &concern, &grateful, &learn, &milestone, &entered)
 	}
 
 	// if it was entered today, provide the details
 	recordTime := getDateFromUnixTime(entered)
 	nowTime := getDateNow()
 	if cmp.Equal(nowTime, recordTime) {
-		return entity.EntryWithAllFields(id, score, concern, grateful, learn, entered)
+		return entity.EntryWithAllFields(id, score, concern, grateful, learn, milestone, entered)
 	}
 	return entity.EmptyEntry()
 }
@@ -145,6 +151,7 @@ func overwriteEntry(entry entity.Entry) bool {
 	fmt.Printf("Concern:\n> %v\n", entry.Concern)
 	fmt.Printf("Grateful:\n> %v\n", entry.Grateful)
 	fmt.Printf("Learned:\n> %v\n", entry.Learn)
+	fmt.Printf("Milestone:\n> %v\n", entry.Milestone)
 	fmt.Printf("---------------------------------\n")
 	fmt.Printf("Delete it and enter a new one? [Y/n]: ")
 
