@@ -162,6 +162,7 @@ func populateEntries(query string) []entity.Entry {
 	return result
 }
 
+// printCsv : for use in `export` flag, prints to stdout
 func printCsv(entries entrySet) {
 	fmt.Printf("\"id\",\"score\",\"concerned\",\"grateful\",\"learned\",\"entered\"\n")
 	for i := 0; i < len(entries); i++ {
@@ -169,9 +170,9 @@ func printCsv(entries entrySet) {
 			"\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
 			strconv.Itoa(entries[i].ID),
 			strconv.Itoa(entries[i].Score),
-			entries[i].Concern,
-			entries[i].Grateful,
-			entries[i].Learn,
+			strings.ReplaceAll(entries[i].Concern, "\"", "\\\""),   // escape quotes since we
+			strings.ReplaceAll(entries[i].Grateful, "\"", "\\\""),  // used them to encapsulate
+			strings.ReplaceAll(entries[i].Learn, "\"", "\\\""),     // the text
 			strconv.FormatInt(entries[i].Entered, 10))
 	}
 }
