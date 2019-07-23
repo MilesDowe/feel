@@ -10,6 +10,10 @@ import (
 // var feelLoc string = os.Getenv("GOPATH") + "/src/github.com/milesdowe/feel"
 const databaseLoc = "C:/Users/Miles/go/src/github.com/milesdowe/feel/feel.db"
 
+//
+// Database queries
+//
+
 const createTable = "CREATE TABLE IF NOT EXISTS feel_recording (" +
 	"id INTEGER PRIMARY KEY," +
 	"score INTEGER," +
@@ -20,6 +24,15 @@ const createTable = "CREATE TABLE IF NOT EXISTS feel_recording (" +
 	"entered INTEGER)"
 
 const deleteRecordPerID = "DELETE FROM feel_recording WHERE id = ?"
+
+// SelectAllQuery : The query for selecting everything from the single database table
+const SelectAllQuery = `
+SELECT id, score, concern, grateful, learn, milestone, entered
+from feel_recording `
+
+//
+// Database operations
+//
 
 // OpenDb : returns a connection to the SQLite database
 func OpenDb() *sql.DB {
@@ -34,16 +47,16 @@ func OpenDb() *sql.DB {
 	return database
 }
 
-// runs a query to create the standard feel_recording table if it doesn't already exist
-func verifyTableExists(db *sql.DB) {
-	stmt, _ := db.Prepare(createTable)
-	defer stmt.Close()
-	stmt.Exec()
-}
-
 // DeleteRecord : deletes the record with the given ID from the feel_recording table
 func DeleteRecord(id int) {
 	db := OpenDb()
 	defer db.Close()
 	db.Exec(deleteRecordPerID, id)
+}
+
+// runs a query to create the standard feel_recording table if it doesn't already exist
+func verifyTableExists(db *sql.DB) {
+	stmt, _ := db.Prepare(createTable)
+	defer stmt.Close()
+	stmt.Exec()
 }

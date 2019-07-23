@@ -23,10 +23,6 @@ type collectedData struct {
 	milestoneCnt int
 }
 
-const allQuery = `
-SELECT id, score, concern, grateful, learn, milestone, entered
-from feel_recording `
-
 //
 // Cobra command creation details
 //
@@ -184,14 +180,14 @@ func printCsv(entries entrySet) {
 // agoQuery : Expands select-all query to limit the number of days ago.
 func agoQuery(days int) string {
 	daysStr := strconv.Itoa(days)
-	return allQuery + "WHERE date(entered, 'unixepoch') >= date('now', 'start of day', '-" +
+	return util.SelectAllQuery + "WHERE date(entered, 'unixepoch') >= date('now', 'start of day', '-" +
 		daysStr + " day')"
 }
 
 // rangeQuery : Expands select-all query to include a date range.
 // TODO: fix localization issue
 func rangeQuery(begin, end string) string {
-	result := allQuery
+	result := util.SelectAllQuery
 
 	hasBegin := begin != ""
 	hasEnd := end != ""
