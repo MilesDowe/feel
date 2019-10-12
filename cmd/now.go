@@ -18,7 +18,11 @@ var nowCmd = &cobra.Command{
 		reader := bufio.NewReader(os.Stdin)
 
 		// no issues with score, proceed to prompt for optional details
-		prompter := util.PromptPrinter{reader, Min, Max}
+        prompter := util.PromptPrinter{
+            Reader: reader,
+            Min: Min,
+            Max: Max,
+        }
 
 		// get most recent record, if today, prompt to overwrite
 		if entry := checkForExistingEntry(); entry.ID != -1 {
