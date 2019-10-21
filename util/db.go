@@ -14,14 +14,15 @@ const databaseLoc = "C:/Users/Miles/go/src/github.com/milesdowe/feel/feel.db"
 // Database queries
 //
 
-const createTable = "CREATE TABLE IF NOT EXISTS feel_recording (" +
-	"id INTEGER PRIMARY KEY," +
-	"score INTEGER," +
-	"concern TEXT NULLABLE," +
-	"grateful TEXT NULLABLE," +
-	"learn TEXT NULLABLE," +
-	"milestone TEXT NULLABLE," +
-	"entered INTEGER)"
+const createTable = `
+CREATE TABLE IF NOT EXISTS feel_recording (
+id INTEGER PRIMARY KEY,
+score INTEGER,
+concern TEXT NULLABLE,
+grateful TEXT NULLABLE,
+learn TEXT NULLABLE,
+milestone TEXT NULLABLE,
+entered INTEGER)`
 
 const deleteRecordPerID = "DELETE FROM feel_recording WHERE id = ?"
 

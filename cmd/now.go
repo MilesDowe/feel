@@ -17,7 +17,7 @@ var nowCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		reader := bufio.NewReader(os.Stdin)
 
-		// no issues with score, proceed to prompt for optional details
+		// create object for prompting/guiding user
 		prompter := util.PromptPrinter{
 			Reader: reader,
 			Min:    Min,
@@ -78,6 +78,7 @@ func getDateNow() date {
 // prompts user for happiness details, returns results
 func readUserInput(prompter util.PromptPrinter) entity.Entry {
 	score := prompter.GetScore()
+
 	concern := prompter.GetOptionalDetail("Anything have you concerned?")
 	grateful := prompter.GetOptionalDetail("Do you feel grateful for anything?")
 	learn := prompter.GetOptionalDetail("Did you learn anything new today?")

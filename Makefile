@@ -1,10 +1,14 @@
-CC=go
+GC=go
 
 make:
-	$(CC) install
+	$(GC) install
 
 compile:
-	$(CC) build
+	$(GC) build
 
 test:
-	$(CC) test ./...
+	$(GC) test ./...
+
+.PHONY: clean
+clean:
+	-rm feel.exe
