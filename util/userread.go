@@ -11,6 +11,11 @@ func GetUserConfirmation() bool {
 	reader := bufio.NewReader(os.Stdin)
 	response, _ := reader.ReadString('\n')
 
+	return CheckInput(response)
+}
+
+// CheckInput : Give true if 'yes' provided
+func CheckInput(response string) bool {
 	response = strings.TrimSpace(response)
 	response = strings.ToLower(response)
 

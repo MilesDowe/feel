@@ -2,7 +2,6 @@ package util
 
 import (
 	"database/sql"
-	"fmt"
 	_ "github.com/mattn/go-sqlite3" // database driver
 	"log"
 	"os/user"

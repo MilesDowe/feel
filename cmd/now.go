@@ -86,16 +86,16 @@ func readUserInput() entity.Entry {
 	fmt.Printf("How happy do you feel right now? Choose from %s (awful) to %s (great):\n> ", MinStr, MaxStr)
 	score, _ := reader.ReadString('\n')
 
-	fmt.Printf("Anything have you concerned?" + skipNotice)
+	fmt.Printf("\nAnything have you concerned?" + skipNotice)
 	concern, _ := reader.ReadString('\n')
 
-	fmt.Printf("Do you feel grateful for anything?" + skipNotice)
+	fmt.Printf("\nDo you feel grateful for anything?" + skipNotice)
 	grateful, _ := reader.ReadString('\n')
 
-	fmt.Printf("Did you learn anything new today?" + skipNotice)
+	fmt.Printf("\nDid you learn anything new today?" + skipNotice)
 	learn, _ := reader.ReadString('\n')
 
-	fmt.Printf("Any noteable milestones?" + skipNotice)
+	fmt.Printf("\nAny noteable milestones?" + skipNotice)
 	milestone, _ := reader.ReadString('\n')
 
 	// check provided score is in range
