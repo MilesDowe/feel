@@ -3,9 +3,9 @@ package cmd
 import (
 	"bufio"
 	"fmt"
+	"github.com/MilesDowe/feel/entity"
+	"github.com/MilesDowe/feel/util"
 	"github.com/google/go-cmp/cmp"
-	"github.com/milesdowe/feel/entity"
-	"github.com/milesdowe/feel/util"
 	"github.com/spf13/cobra"
 	"log"
 	"os"

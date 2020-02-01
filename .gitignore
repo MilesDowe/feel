@@ -1,6 +1,9 @@
 # Ignore compiled items
+feel
 feel.exe
 feel.db
 
 # IDE stuff
 *.un~
+TAGS
+tags

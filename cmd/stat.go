@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/milesdowe/feel/entity"
-	"github.com/milesdowe/feel/util"
+	"github.com/MilesDowe/feel/entity"
+	"github.com/MilesDowe/feel/util"
 	"github.com/montanaflynn/stats"
 	"github.com/spf13/cobra"
 	"strconv"

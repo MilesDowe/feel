@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/milesdowe/feel/util"
+	"github.com/MilesDowe/feel/util"
 	"github.com/spf13/cobra"
 	"strconv"
 	"strings"

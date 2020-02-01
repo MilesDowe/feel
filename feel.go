@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/milesdowe/feel/cmd"
+	"github.com/MilesDowe/feel/cmd"
 )
 
 func main() {

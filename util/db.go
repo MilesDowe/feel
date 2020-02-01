@@ -4,11 +4,9 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3" // database driver
+	"log"
+	"os/user"
 )
-
-// TODO: get GOPATH lookup to work:
-// var feelLoc string = os.Getenv("GOPATH") + "/src/github.com/milesdowe/feel"
-const databaseLoc = "C:/Users/Miles/go/src/github.com/milesdowe/feel/feel.db"
 
 const createTable = "CREATE TABLE IF NOT EXISTS feel_recording (" +
 	"id INTEGER PRIMARY KEY," +
@@ -21,14 +19,23 @@ const createTable = "CREATE TABLE IF NOT EXISTS feel_recording (" +
 
 const deleteRecordPerID = "DELETE FROM feel_recording WHERE id = ?"
 
+var databaseLoc = ""
+
 // OpenDb : returns a connection to the SQLite database
 func OpenDb() *sql.DB {
+	if databaseLoc == "" {
+		usr, err := user.Current()
+		if err != nil {
+			log.Fatal(err)
+		}
+		databaseLoc = usr.HomeDir + "/go/src/github.com/MilesDowe/feel/feel.db"
+	}
 	database, err := sql.Open("sqlite3", databaseLoc)
 
 	verifyTableExists(database)
 
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 
 	return database
@@ -36,8 +43,13 @@ func OpenDb() *sql.DB {
 
 // runs a query to create the standard feel_recording table if it doesn't already exist
 func verifyTableExists(db *sql.DB) {
-	stmt, _ := db.Prepare(createTable)
+	stmt, err := db.Prepare(createTable)
 	defer stmt.Close()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	stmt.Exec()
 }
 
